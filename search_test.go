@@ -12,8 +12,10 @@ func TestByName(t *testing.T) {
 		ok      bool
 	}{
 		{"search.go", ".", 1, true},
-		{"search*", "", 2, true},
+		{"search*", "", 2, true}, // no directory means "."
 		{"x", ".", 0, false},
+		{"whatever", "nosuchdir", 0, false},
+		{"", ".", 0, false},
 	}
 	for _, d := range data {
 		result, err := ByName(d.pattern, d.root)

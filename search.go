@@ -31,7 +31,10 @@ func search(m Matcher, root string) (result []string, err error) {
 	if root == "" {
 		root = "."
 	}
-	filepath.Walk(root, visit)
+	err = filepath.Walk(root, visit)
+	if err != nil {
+		return
+	}
 	if len(result) == 0 {
 		err = fmt.Errorf("File not found")
 	}
