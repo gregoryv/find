@@ -6,23 +6,7 @@ import (
 	"path/filepath"
 )
 
-type Matcher interface {
-	Match(path string)(bool, error)
-}
-
-type shellPattern struct {
-	pattern string
-}
-
-func NewShellPattern(pattern string) Matcher {
-	return &shellPattern{pattern: pattern}
-}
-
-func (sp *shellPattern) Match(path string) (bool, error) {
-	return filepath.Match(sp.pattern, path)
-}
-
-func File(pattern, root string) (result []string, err error) {
+func ByName(pattern, root string) (result []string, err error) {
 	sp := NewShellPattern(pattern)
 	return search(sp, root)
 }

@@ -4,9 +4,4 @@
 
 ## Usage
 
-    import "github.com/gregoryv/find"
-
-	func main() {
-	    result, _ := find.File("ex*.go", ".")
-		//...
-	}
+See examples in [find](https://godoc.org/github.com/gregoryv/find)!
