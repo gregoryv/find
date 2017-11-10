@@ -1,6 +1,6 @@
-# find
+[find](https://godoc.org/github.com/gregoryv/find) - Go package for locating files
 
-Go package implementing functions similar to the find command
+[![Build Status](https://travis-ci.org/gregoryv/find.svg?branch=master)](https://travis-ci.org/gregoryv/find)
 
 ## Usage
 
