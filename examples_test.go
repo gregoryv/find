@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleByName() {
-	result, _ := find.ByName("*.go", ".")
+	result, _ := find.ByName("*.md", ".")
 	fmt.Printf("%v", result)
-	//output:[examples_test.go search.go search_test.go shell.go]
+	//output:[README.md]
 }

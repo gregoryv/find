@@ -8,10 +8,11 @@ import (
 
 func ByName(pattern, root string) (result []string, err error) {
 	sp := NewShellPattern(pattern)
-	return search(sp, root)
+	return By(sp, root)
 }
 
-func search(m Matcher, root string) (result []string, err error) {
+
+func By(m Matcher, root string) (result []string, err error) {
 	result = make([]string, 0)
 	visit := func(path string, f os.FileInfo, err error) error {
 		if err != nil {

@@ -2,7 +2,24 @@ package find
 
 import (
 	"testing"
+	"regexp"
 )
+
+func TestBy(t *testing.T) {
+	data := []struct {
+		m Matcher
+		root string
+		count int
+	}{
+		{NewRegexp(regexp.MustCompile(`.*\.md`)), ".", 1},
+	}
+	for _, d := range data {
+		result, _ := By(d.m, d.root)
+		if len(result) != d.count {
+			t.Errorf("By(%q, %q) expected to find %v files, found %v", d.m, d.root, d.count, len(result))
+		}
+	}
+}
 
 func TestByName(t *testing.T) {
 	data := []struct {
