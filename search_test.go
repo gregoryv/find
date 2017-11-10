@@ -1,19 +1,8 @@
 package find
 
 import (
-	"fmt"
 	"testing"
 )
-
-func ExampleByName() {
-	result, _ := ByName("*.go", ".")
-	for _, file := range result {
-		fmt.Println(file)
-	}
-	//output:search.go
-	//search_test.go
-	//shell.go
-}
 
 func TestByName(t *testing.T) {
 	data := []struct {

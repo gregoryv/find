@@ -4,4 +4,4 @@
 
 ## Usage
 
-See examples in [find](https://godoc.org/github.com/gregoryv/find)!
+See [package examples](https://godoc.org/github.com/gregoryv/find#pkg-examples)!
