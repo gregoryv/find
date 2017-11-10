@@ -2,7 +2,17 @@ package find
 
 import (
 	"testing"
+	"fmt"
 )
+
+func ExampleFile() {
+	result, _ := File("*.go", ".")
+	for _, file := range result {
+		fmt.Println(file)
+	}
+	//output: file.go
+	//file_test.go
+}
 
 func TestFile(t *testing.T) {
 	data := []struct {
