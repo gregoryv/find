@@ -18,10 +18,7 @@ func By(m Matcher, root string) (result []string, err error) {
 			return err
 		}
 		if !f.IsDir() {
-			matched, err := m.Match(f.Name())
-			if err != nil {
-				return err
-			}
+			matched := m.Match(f.Name())
 			if matched {
 				result = append(result, path)
 			}

@@ -5,7 +5,7 @@ import (
 )
 
 type Matcher interface {
-	Match(path string) (bool, error)
+	Match(path string) bool
 }
 
 type shellPattern struct {
@@ -16,6 +16,7 @@ func NewShellPattern(pattern string) Matcher {
 	return &shellPattern{pattern: pattern}
 }
 
-func (sp *shellPattern) Match(path string) (bool, error) {
-	return filepath.Match(sp.pattern, path)
+func (sp *shellPattern) Match(path string) bool {
+	res, _ := filepath.Match(sp.pattern, path)
+	return res
 }
