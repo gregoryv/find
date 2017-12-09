@@ -11,7 +11,6 @@ func ByName(pattern, root string) (result []string, err error) {
 	return By(sp, root)
 }
 
-
 func By(m Matcher, root string) (result []string, err error) {
 	result = make([]string, 0)
 	visit := func(path string, f os.FileInfo, err error) error {

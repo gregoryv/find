@@ -1,26 +1,26 @@
 package find_test
 
 import (
-	"testing"
-	"regexp"
-	"os"
-	"io/ioutil"
-	"path"
-		"fmt"
+	"fmt"
 	"github.com/gregoryv/find"
+	"io/ioutil"
+	"os"
+	"path"
+	"regexp"
+	"testing"
 )
 
 var testRoot string // set by TestSuite
 
-func TestSuite(t *testing.T) {
+func init() {
 	var err error
 	// Setup directory structure for tests
 	testRoot, err = ioutil.TempDir("", "search_test")
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
-	content := []struct{
-		path string
+	content := []struct {
+		path  string
 		isDir bool
 	}{
 		{"cars/", true},
@@ -35,14 +35,17 @@ func TestSuite(t *testing.T) {
 			ioutil.WriteFile(full, []byte{}, 0755)
 		}
 	}
+}
+
+func TestSuite(t *testing.T) {
 	// Run tests
 	os.Chdir(testRoot)
 	t.Run("By", testBy)
 	t.Run("ByName", testByName)
 }
 
-
-func exampleByName() {
+func ExampleByName() {
+	os.Chdir(testRoot)
 	result, _ := find.ByName("*.txt", ".")
 	fmt.Printf("%v", result)
 	//output:[a.txt b.txt]
@@ -50,8 +53,8 @@ func exampleByName() {
 
 func testBy(t *testing.T) {
 	data := []struct {
-		m find.Matcher
-		root string
+		m     find.Matcher
+		root  string
 		count int
 	}{
 		{find.NewRegexp(regexp.MustCompile(`.*\.txt`)), ".", 2},

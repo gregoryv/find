@@ -2,3 +2,4 @@
 GOPATH=$HOME
 go generate ./...
 go test -cover -coverprofile /tmp/c.out
+gofmt -w .
