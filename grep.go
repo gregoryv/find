@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Ref points to a line in a file starting from 0
 type Ref struct {
 	LineNo int
 	Line   string
@@ -13,6 +14,7 @@ type Ref struct {
 
 type Refs []Ref
 
+// Grep finds each line that matches the given pattern.
 func Grep(pattern, file string) (res Refs, err error) {
 	var stream *os.File
 	stream, err = os.Open(file)
