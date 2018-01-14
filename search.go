@@ -27,11 +27,8 @@ func newVisitor(m Matcher, result *list.List) func(string, os.FileInfo, error) e
 		if err != nil {
 			return err
 		}
-		if !f.IsDir() {
-			matched := m.Match(f.Name())
-			if matched {
-				result.PushBack(path)
-			}
+		if !f.IsDir() && m.Match(f.Name()) {
+			result.PushBack(path)
 		}
 		return nil
 	}
