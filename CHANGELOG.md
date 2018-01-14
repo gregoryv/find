@@ -8,4 +8,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - File searching funcs By and ByName
-- Grep for doing pattern search in files
+- InFile and InStream for doing pattern search in files

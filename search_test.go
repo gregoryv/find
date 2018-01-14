@@ -47,8 +47,14 @@ func TestSuite(t *testing.T) {
 func ExampleByName() {
 	os.Chdir(testRoot)
 	result, _ := find.ByName("*.txt", ".")
-	fmt.Printf("%v", result)
-	//output:[a.txt b.txt]
+	for e := result.Front(); e != nil; e = e.Next() {
+		if s, ok := e.Value.(string); ok {
+			fmt.Println(s)
+		}
+	}
+	//output:
+	//a.txt
+	//b.txt
 }
 
 func testBy(t *testing.T) {
@@ -61,8 +67,8 @@ func testBy(t *testing.T) {
 	}
 	for _, d := range data {
 		result, _ := find.By(d.m, d.root)
-		if len(result) != d.count {
-			t.Errorf("By(%q, %q) expected to find %v files, found %v", d.m, d.root, d.count, len(result))
+		if result.Len() != d.count {
+			t.Errorf("By(%q, %q) expected to find %v files, found %v", d.m, d.root, d.count, result.Len())
 		}
 	}
 }
@@ -85,8 +91,8 @@ func testByName(t *testing.T) {
 		if d.ok && err != nil {
 			t.Errorf("ByName(%q, %q): %s", d.pattern, d.root, err)
 		}
-		if len(result) != d.count {
-			t.Errorf("ByName(%q, %q) expected to find %v files, found %v", d.pattern, d.root, d.count, len(result))
+		if result.Len() != d.count {
+			t.Errorf("ByName(%q, %q) expected to find %v files, found %v", d.pattern, d.root, d.count, result.Len())
 		}
 	}
 }

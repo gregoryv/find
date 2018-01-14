@@ -1,21 +1,23 @@
 package find
 
 import (
-	"fmt"
+	"container/list"
 	"os"
 	"path/filepath"
 )
 
-func ByName(pattern, root string) (result []string, err error) {
+// ByName returns a list of files and directories whose names match the shell like pattern
+func ByName(pattern, root string) (result *list.List, err error) {
 	sp := NewShellPattern(pattern)
 	return By(sp, root)
 }
 
-func By(m Matcher, root string) (result []string, err error) {
+// By returns a list of files and directories whose names match
+func By(m Matcher, root string) (result *list.List, err error) {
 	if root == "" {
 		root = "."
 	}
-	result = make([]string, 0)
+	result = list.New()
 	visit := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -23,18 +25,11 @@ func By(m Matcher, root string) (result []string, err error) {
 		if !f.IsDir() {
 			matched := m.Match(f.Name())
 			if matched {
-				result = append(result, path)
+				result.PushBack(path)
 			}
 		}
 		return nil
 	}
 	err = filepath.Walk(root, visit)
-	if err != nil {
-		return
-	}
-	if len(result) == 0 {
-		err = fmt.Errorf("File not found")
-	}
-
 	return
 }
