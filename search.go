@@ -12,6 +12,9 @@ func ByName(pattern, root string) (result []string, err error) {
 }
 
 func By(m Matcher, root string) (result []string, err error) {
+	if root == "" {
+		root = "."
+	}
 	result = make([]string, 0)
 	visit := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
@@ -24,9 +27,6 @@ func By(m Matcher, root string) (result []string, err error) {
 			}
 		}
 		return nil
-	}
-	if root == "" {
-		root = "."
 	}
 	err = filepath.Walk(root, visit)
 	if err != nil {

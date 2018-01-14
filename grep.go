@@ -2,6 +2,8 @@ package find
 
 import (
 	"bufio"
+	"container/list"
+	"fmt"
 	"io"
 	"os"
 )
@@ -12,32 +14,37 @@ type Ref struct {
 	Line   string
 }
 
-type Refs []Ref
+func (ref *Ref) String() string {
+	return fmt.Sprintf("%v:%s", ref.LineNo, ref.Line)
+}
 
-// Grep finds each line that matches the given pattern.
-func Grep(pattern, file string) (res Refs, err error) {
+// InFile opens and the file and uses InStream to find references
+func InFile(pattern, file string) (result *list.List, err error) {
 	var stream *os.File
 	stream, err = os.Open(file)
 	if err != nil {
 		return
 	}
 	defer stream.Close()
-	return grep(pattern, stream), nil
+	return InStream(pattern, stream), nil
 }
 
-func grep(pattern string, stream io.Reader) Refs {
-	res := make([]Ref, 0)
-	scanner := bufio.NewScanner(stream)
-	sp := NewShellPattern("*" + pattern + "*")
-	var line string
-	var no int
+// InStream works much like grep, finding references by the given pattern
+func InStream(pattern string, stream io.Reader) *list.List {
+	var (
+		scanner = bufio.NewScanner(stream)
+		sp      = NewShellPattern("*" + pattern + "*")
+		line    string
+		lineNo  int
+		result  = list.New()
+	)
+
 	for scanner.Scan() {
 		line = scanner.Text()
 		if sp.Match(line) {
-			res = append(res, Ref{no, line})
+			result.PushBack(&Ref{lineNo, line})
 		}
-		no++
+		lineNo++
 	}
-
-	return res
+	return result
 }
