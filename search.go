@@ -18,7 +18,12 @@ func By(m Matcher, root string) (result *list.List, err error) {
 		root = "."
 	}
 	result = list.New()
-	visit := func(path string, f os.FileInfo, err error) error {
+	err = filepath.Walk(root, newVisitor(m, result))
+	return
+}
+
+func newVisitor(m Matcher, result *list.List) func(string, os.FileInfo, error) error {
+	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -30,6 +35,4 @@ func By(m Matcher, root string) (result *list.List, err error) {
 		}
 		return nil
 	}
-	err = filepath.Walk(root, visit)
-	return
 }
