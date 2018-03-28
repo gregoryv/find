@@ -1,3 +1,4 @@
+// Package find implements search funcs for finding files by name or content
 package find
 
 import (
