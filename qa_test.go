@@ -1,8 +1,8 @@
 package find
 
 import (
-	"testing"
 	"github.com/gregoryv/qual"
+	"testing"
 )
 
 func Test_quality(t *testing.T) {

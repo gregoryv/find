@@ -68,7 +68,8 @@ func testBy(t *testing.T) {
 	for _, d := range data {
 		result, _ := find.By(d.m, d.root)
 		if result.Len() != d.count {
-			t.Errorf("By(%q, %q) expected to find %v files, found %v", d.m, d.root, d.count, result.Len())
+			t.Errorf("By(%q, %q) expected to find %v files, found %v",
+				d.m, d.root, d.count, result.Len())
 		}
 	}
 }
@@ -92,7 +93,8 @@ func testByName(t *testing.T) {
 			t.Errorf("ByName(%q, %q): %s", d.pattern, d.root, err)
 		}
 		if result.Len() != d.count {
-			t.Errorf("ByName(%q, %q) expected to find %v files, found %v", d.pattern, d.root, d.count, result.Len())
+			t.Errorf("ByName(%q, %q) expected to find %v files, found %v",
+				d.pattern, d.root, d.count, result.Len())
 		}
 	}
 }

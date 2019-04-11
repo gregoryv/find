@@ -1,12 +1,14 @@
 package find_test
 
 import (
+	"container/list"
 	"github.com/gregoryv/find"
 	"io/ioutil"
-	"container/list"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/gregoryv/asserter"
 )
 
 func TestInFile(t *testing.T) {
@@ -15,26 +17,23 @@ func TestInFile(t *testing.T) {
 a hello
 a world
 `), 0644)
-	data := []struct {
+	cases := []struct {
 		pattern, file string
 		exp           string
-		expErr            bool
+		expErr        bool
 	}{
 		{"a hello", file.Name(), "1:a hello", true},
 		{"a*", file.Name(), "1:a hello,2:a world", true},
 		{"*", "nosuchfile", "", false},
 	}
 
-	for _, d := range data {
-		res, err := find.InFile(d.pattern, d.file)
+	assert := asserter.New(t)
+	for _, c := range cases {
+		res, err := find.InFile(c.pattern, c.file)
 		result := asLine(res)
-		// Assert
-		if d.expErr != (err == nil) {
-			t.Error(err)
-		}
-		if result != d.exp {
-			t.Errorf("Grep(%q, %q) expected \n%v\n, got\n %v", d.pattern, d.file, d.exp, result)
-		}
+		failed := err == nil
+		assert(c.expErr == failed).Error(err)
+		assert().Equals(result, c.exp)
 	}
 }
 
