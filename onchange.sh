@@ -1,6 +1,14 @@
 #!/bin/bash -e
-GOPATH=$HOME
-go generate ./...
-go test -cover -coverprofile /tmp/c.out
-go tool cover -o /tmp/coverage.html -html /tmp/c.out
-gofmt -w .
+path=$1
+dir=$(dirname "$path")
+filename=$(basename "$path")
+extension="${filename##*.}"
+nameonly="${filename%.*}"
+
+case $extension in
+    go)
+        goimports -w $path
+        ;;
+esac
+go test -coverprofile /tmp/c.out ./...
+uncover /tmp/c.out

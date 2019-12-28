@@ -1,13 +1,15 @@
 package find_test
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/gregoryv/find"
 	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
 	"testing"
+
+	"github.com/gregoryv/find"
 )
 
 var testRoot string // set by TestSuite
@@ -37,11 +39,9 @@ func init() {
 	}
 }
 
-func TestSuite(t *testing.T) {
-	// Run tests
+func TestMain(m *testing.M) {
 	os.Chdir(testRoot)
-	t.Run("By", testBy)
-	t.Run("ByName", testByName)
+	os.Exit(m.Run())
 }
 
 func ExampleByName() {
@@ -57,7 +57,19 @@ func ExampleByName() {
 	//b.txt
 }
 
-func testBy(t *testing.T) {
+func ExampleResult_Map() {
+	os.Chdir(testRoot)
+	result, _ := find.ByName("*.txt", ".")
+	echo := func(name string) {
+		fmt.Println(name)
+	}
+	result.Map(echo)
+	//output:
+	//a.txt
+	//b.txt
+}
+
+func TestBy(t *testing.T) {
 	data := []struct {
 		m     find.Matcher
 		root  string
@@ -74,7 +86,7 @@ func testBy(t *testing.T) {
 	}
 }
 
-func testByName(t *testing.T) {
+func TestByName(t *testing.T) {
 	data := []struct {
 		pattern string
 		root    string
@@ -96,5 +108,22 @@ func testByName(t *testing.T) {
 			t.Errorf("ByName(%q, %q) expected to find %v files, found %v",
 				d.pattern, d.root, d.count, result.Len())
 		}
+	}
+}
+
+func TestResult_Map(t *testing.T) {
+	result, _ := find.ByName("*.txt", ".")
+	result.PushBack(1)
+	w := bytes.NewBufferString("")
+	echo := func(name string) {
+		fmt.Fprint(w, name, "\n")
+	}
+	result.Map(echo)
+	got := w.String()
+	exp := `a.txt
+b.txt
+`
+	if got != exp {
+		t.Error(got, exp)
 	}
 }

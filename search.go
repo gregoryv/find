@@ -8,23 +8,23 @@ import (
 )
 
 // ByName returns a list of files whose names match the shell like pattern
-func ByName(pattern, root string) (result *list.List, err error) {
+func ByName(pattern, root string) (*Result, error) {
 	sp := NewShellPattern(pattern)
 	return By(sp, root)
 }
 
 // By returns a list of files whose names match
-func By(m Matcher, root string) (result *list.List, err error) {
+func By(m Matcher, root string) (*Result, error) {
 	if root == "" {
 		root = "."
 	}
-	result = list.New()
-	err = filepath.Walk(root, newVisitor(m, result))
-	return
+	result := &Result{list.New()}
+	err := filepath.Walk(root, newVisitor(m, result))
+	return result, err
 }
 
 // Returns a visitor that skips directories
-func newVisitor(m Matcher, result *list.List) filepath.WalkFunc {
+func newVisitor(m Matcher, result *Result) filepath.WalkFunc {
 	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -33,5 +33,19 @@ func newVisitor(m Matcher, result *list.List) filepath.WalkFunc {
 			result.PushBack(path)
 		}
 		return nil
+	}
+}
+
+type Result struct {
+	*list.List
+}
+
+func (result *Result) Map(fn func(string)) {
+	for e := result.Front(); e != nil; e = e.Next() {
+		s, ok := e.Value.(string)
+		if !ok {
+			continue
+		}
+		fn(s)
 	}
 }
