@@ -10,5 +10,6 @@ case $extension in
         goimports -w $path
         ;;
 esac
+go install ./cmd/ifind
 go test -coverprofile /tmp/c.out ./...
 uncover /tmp/c.out
