@@ -44,9 +44,17 @@ func main() {
 			i++
 			if i == oi {
 				editor := os.Getenv("EDITOR")
-				err := exec.Command(
-					editor, "-n", fmt.Sprintf("+%d", lm.Line), fm.Filename,
-				).Run()
+				// Adapt command to open on a specific line
+				var cmd *exec.Cmd
+				switch editor {
+				case "emacs", "emacsclient", "vi", "vim":
+					cmd = exec.Command(
+						editor, "-n", fmt.Sprintf("+%d", lm.Line), fm.Filename,
+					)
+				default:
+					cmd = exec.Command(editor, fm.Filename)
+				}
+				err := cmd.Start()
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
