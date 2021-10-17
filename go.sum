@@ -17,7 +17,6 @@ github.com/gregoryv/qual v0.4.0 h1:CqXWXavcX0YRbgMaX/kyY96yZFFbYHg1k1+qXK22HJ8=
 github.com/gregoryv/qual v0.4.0/go.mod h1:dB0ZUMaE5qieQ975kKI7A4CDfg6wgcsPcSlY1SWuq9Y=
 github.com/gregoryv/web v0.21.0 h1:pY9CfNiSK0H8wCnYN3irAm7nHmpw3/RXI00VJB9J8Qg=
 github.com/gregoryv/web v0.21.0/go.mod h1:wAsePq4XiIuLmEOI9qNpgaK3rdXY3huHkwNGjUuvngw=
-github.com/gregoryv/workdir v0.2.0 h1:a0V87TpJpda5rHPj+lrJTiUD7pqdddUERYPWEJY8ufc=
 github.com/gregoryv/workdir v0.2.0/go.mod h1:qX7yFN0yqysNfEr2F5Tta9+5K8oueS/sqBmdiExBoYA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
