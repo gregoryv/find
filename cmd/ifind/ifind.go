@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gregoryv/cmdline"
 	"github.com/gregoryv/find"
@@ -21,7 +22,10 @@ func main() {
 	cli.Parse()
 
 	s := NewScanner()
-	s.SetFiles(ls(files))
+	filter := &smart{}
+	s.SetFiles(
+		ls(files, filter),
+	)
 
 	if err := s.Scan(expr); err != nil {
 		fmt.Println(err)
@@ -68,7 +72,7 @@ func main() {
 
 // ls returns a list of files based on the given pattern. Empty string means
 // recursive from current working directory
-func ls(pattern string) []string {
+func ls(pattern string, filter find.Matcher) []string {
 	if pattern != "" {
 		f, _ := filepath.Glob(pattern)
 		return f
@@ -77,9 +81,22 @@ func ls(pattern string) []string {
 	result, _ := find.ByName("*", ".")
 	files := make([]string, 0)
 	for e := result.Front(); e != nil; e = e.Next() {
-		if s, ok := e.Value.(string); ok {
-			files = append(files, s)
+		filename := e.Value.(string)
+		if filter.Match(filename) {
+			files = append(files, filename)
 		}
 	}
 	return files
+}
+
+type smart struct{}
+
+// Match excludes git project files, e.g. .git/
+func (me *smart) Match(path string) bool {
+	switch {
+	case strings.Index(path, ".git/") == 0:
+	default:
+		return true
+	}
+	return false
 }
