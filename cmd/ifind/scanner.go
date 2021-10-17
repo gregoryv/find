@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strings"
 )
 
 func NewScanner() *Scanner {
@@ -50,7 +51,7 @@ func (me *Scanner) Scan(expr string) error {
 			if re.MatchString(text) {
 				fm.Result = append(fm.Result, LineMatch{
 					Line: line,
-					Text: text,
+					Text: strings.TrimSpace(text),
 				})
 			}
 		}
