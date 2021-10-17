@@ -16,6 +16,7 @@ func main() {
 	var (
 		cli       = cmdline.NewBasicParser()
 		files     = cli.Option("-f, --files").String("")
+		colors    = cli.Flag("-c, --colors")
 		expr      = cli.Required("EXPR").String("")
 		openIndex = cli.Optional("OPEN_INDEX").String("")
 	)
@@ -33,7 +34,23 @@ func main() {
 	}
 
 	if openIndex == "" {
-		s.WriteResult(os.Stdout)
+		var i int
+		w := os.Stdout
+		for _, fm := range s.LastResult() {
+			fmt.Fprintln(w, fm.Filename)
+			for _, m := range fm.Result {
+				text := m.Text
+				if colors {
+					// todo use colors
+					colored := fmt.Sprintf("%s%s%s", green, expr, reset)
+					text = strings.ReplaceAll(text, expr, colored)
+				}
+				fmt.Fprintln(w, i+1, text)
+				i++
+			}
+			fmt.Fprintln(w)
+		}
+
 		os.Exit(0)
 	}
 
@@ -100,3 +117,9 @@ func (me *smart) Match(path string) bool {
 	}
 	return false
 }
+
+var (
+	//	red   = "\033[31m"
+	green = "\033[32m"
+	reset = "\033[0m"
+)
