@@ -55,7 +55,6 @@ func main() {
 			for _, m := range fm.Result {
 				text := m.Text
 				if colors {
-					// todo use colors
 					colored := fmt.Sprintf("%s%s%s", green, expr, reset)
 					text = strings.ReplaceAll(text, expr, colored)
 				}
@@ -85,6 +84,10 @@ func main() {
 				case "emacs", "emacsclient", "vi", "vim":
 					cmd = exec.Command(
 						editor, "-n", fmt.Sprintf("+%d", lm.Line), fm.Filename,
+					)
+				case "code", "Code.exe", "code.exe":
+					cmd = exec.Command(
+						editor, "--goto", fmt.Sprintf("%s:%d", fm.Filename, lm.Line),
 					)
 				default:
 					cmd = exec.Command(editor, fm.Filename)
