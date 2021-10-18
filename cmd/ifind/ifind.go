@@ -15,11 +15,25 @@ import (
 func main() {
 	var (
 		cli       = cmdline.NewBasicParser()
-		files     = cli.Option("-f, --files").String("")
+		filesOpt  = cli.Option("-f, --files")
+		files     = filesOpt.String("")
 		colors    = cli.Flag("-c, --colors")
 		expr      = cli.Required("EXPR").String("")
 		openIndex = cli.Optional("OPEN_INDEX").String("")
 	)
+	filesOpt.Doc(
+		"Empty means current working directory and recursive.",
+		"The pattern is a glob format like *.go or *.txt",
+		"",
+		"Examples",
+		"",
+		"Look for EXPR in all text files",
+		"    $ ifind -f *.txt EXPR",
+		"",
+		"Open the third match",
+		"    $ EDITOR=emacsclient ifind -f *.txt EXPR 3",
+	)
+
 	cli.Parse()
 
 	s := NewScanner()
