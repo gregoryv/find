@@ -2,8 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -65,18 +63,6 @@ func (me *Scanner) Scan(expr string) error {
 
 func (me *Scanner) LastResult() []FileMatch {
 	return me.result
-}
-
-func (me *Scanner) WriteResult(w io.Writer) {
-	var i int
-	for _, fm := range me.result {
-		fmt.Fprintln(w, fm.Filename)
-		for _, m := range fm.Result {
-			fmt.Fprintln(w, i+1, m.Text)
-			i++
-		}
-		fmt.Fprintln(w)
-	}
 }
 
 // Files returns a filtered list of files
