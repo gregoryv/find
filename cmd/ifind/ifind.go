@@ -13,8 +13,11 @@ import (
 )
 
 func main() {
+	cli := cmdline.NewBasicParser()
+	cli.Preface(
+		"ifind - grep expression and quick open indexed result",
+	)
 	var (
-		cli       = cmdline.NewBasicParser()
 		filesOpt  = cli.Option("-f, --files")
 		files     = filesOpt.String("")
 		colors    = cli.Flag("-c, --colors")
@@ -24,12 +27,13 @@ func main() {
 	filesOpt.Doc(
 		"Empty means current working directory and recursive.",
 		"The pattern is a glob format like *.go or *.txt",
-		"",
-		"Examples",
-		"",
+	)
+	u := cli.Usage()
+	u.Example(
 		"Look for EXPR in all text files",
 		"    $ ifind -f *.txt EXPR",
-		"",
+	)
+	u.Example(
 		"Open the third match",
 		"    $ EDITOR=emacsclient ifind -f *.txt EXPR 3",
 	)
