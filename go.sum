@@ -3,6 +3,10 @@ github.com/gregoryv/asserter v0.4.1-0.20201128093127-74b8bb2743ca h1:9hfg2CtowsS
 github.com/gregoryv/asserter v0.4.1-0.20201128093127-74b8bb2743ca/go.mod h1:z1mBb29IGWaSx97sT7+i5j+KCbl+kBth9mwmX56mrNU=
 github.com/gregoryv/cmdline v0.6.1 h1:rjs0kcQw7k9QAyfShCbN0/ri01pbXyWD4tWxZkrGYIE=
 github.com/gregoryv/cmdline v0.6.1/go.mod h1:HMy8QMZfta+VoVCmU97HFm+UR5/Cj03n9uA+7sQyuJU=
+github.com/gregoryv/cmdline v0.6.2-0.20211021041444-106b8a13f0ba h1:Xrmi4GY9Om5WCfmyDu2PYrn2M0bBGootjiEdlktNdKQ=
+github.com/gregoryv/cmdline v0.6.2-0.20211021041444-106b8a13f0ba/go.mod h1:HMy8QMZfta+VoVCmU97HFm+UR5/Cj03n9uA+7sQyuJU=
+github.com/gregoryv/cmdline v0.7.0 h1:q8f/Jsl6j4U0KN5tddWoU8fFuZUTbDyu6aG7oZZ8Szg=
+github.com/gregoryv/cmdline v0.7.0/go.mod h1:HMy8QMZfta+VoVCmU97HFm+UR5/Cj03n9uA+7sQyuJU=
 github.com/gregoryv/find v0.0.0-20180328085109-1bbc2d70c482/go.mod h1:/xxQlO62bzxhyabf2iKJzGJa+VAJy25spLI/6ICTrxU=
 github.com/gregoryv/find v0.0.0-20180328085109-1bbc2d70c482/go.mod h1:/xxQlO62bzxhyabf2iKJzGJa+VAJy25spLI/6ICTrxU=
 github.com/gregoryv/find v0.2.0/go.mod h1:ZxH/FkVt6VM//T7edeCqCc2dJRrLAtCYvtvdM6Hk398=
