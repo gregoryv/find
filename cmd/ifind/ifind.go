@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gregoryv/binext"
 	"github.com/gregoryv/cmdline"
 	"github.com/gregoryv/find"
 )
@@ -18,11 +19,12 @@ func main() {
 		"ifind - grep expression and quick open indexed result",
 	)
 	var (
-		filesOpt  = cli.Option("-f, --files")
-		files     = filesOpt.String("")
-		colors    = cli.Flag("-c, --colors")
-		expr      = cli.Required("EXPR").String("")
-		openIndex = cli.Optional("OPEN_INDEX").String("")
+		filesOpt      = cli.Option("-f, --files")
+		files         = filesOpt.String("")
+		colors        = cli.Flag("-c, --colors")
+		includeBinary = cli.Flag("-i, --include-binary")
+		expr          = cli.Required("EXPR").String("")
+		openIndex     = cli.Optional("OPEN_INDEX").String("")
 	)
 	filesOpt.Doc(
 		"Empty means current working directory and recursive.",
@@ -42,6 +44,7 @@ func main() {
 
 	s := NewScanner()
 	filter := &smart{}
+	filter.SetIncludeBinary(includeBinary)
 	s.SetFiles(
 		ls(files, filter),
 	)
@@ -127,16 +130,24 @@ func ls(pattern string, filter find.Matcher) []string {
 	return files
 }
 
-type smart struct{}
+type smart struct {
+	includeBinary bool
+}
+
+func (me *smart) SetIncludeBinary(v bool) {
+	me.includeBinary = v
+}
 
 // Match excludes git project files, e.g. .git/
 func (me *smart) Match(path string) bool {
 	switch {
-	case strings.Index(path, ".git/") == 0:
+	case strings.HasPrefix(path, ".git/"):
+		return false
+	case !me.includeBinary && binext.IsBinary(path):
+		return false
 	default:
 		return true
 	}
-	return false
 }
 
 var (

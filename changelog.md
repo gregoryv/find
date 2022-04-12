@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
+- Skip binary files by default
+- Add flag -i, --include-binary
 - Improve usage and examples
 
 ## [0.4.0] - 2021-10-19

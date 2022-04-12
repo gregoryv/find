@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/gregoryv/asserter v0.4.1-0.20201128093127-74b8bb2743ca
+	github.com/gregoryv/binext v0.1.0
 	github.com/gregoryv/cmdline v0.7.0
 	github.com/gregoryv/qual v0.4.0
 )
