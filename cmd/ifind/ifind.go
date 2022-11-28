@@ -23,6 +23,7 @@ func main() {
 		files         = filesOpt.String("")
 		colors        = cli.Flag("-c, --colors")
 		includeBinary = cli.Flag("-i, --include-binary")
+		writeAliases  = cli.Flag("-a, --aliases")
 		expr          = cli.Required("EXPR").String("")
 		openIndex     = cli.Optional("OPEN_INDEX").String("")
 	)
@@ -54,9 +55,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	if openIndex == "" {
+	// Write results here
+	w := os.Stdout
+
+	if writeAliases {
 		var i int
-		w := os.Stdout
+		for _, fm := range s.LastResult() {
+			for _, lm := range fm.Result {
+				fmt.Fprintln(w, aliasLine(i+1, fm, lm))
+				i++
+			}
+		}
+		os.Exit(0)
+	}
+
+	if openIndex == "" { // list result
+		var i int
 		for _, fm := range s.LastResult() {
 			fmt.Fprintln(w, fm.Filename)
 			for _, m := range fm.Result {
@@ -70,7 +84,6 @@ func main() {
 			}
 			fmt.Fprintln(w)
 		}
-
 		os.Exit(0)
 	}
 
@@ -108,7 +121,19 @@ func main() {
 			}
 		}
 	}
+}
 
+func aliasLine(i int, fm FileMatch, lm LineMatch) string {
+	editor := os.Getenv("EDITOR")
+
+	var cmd string
+	switch editor {
+	case "emacs", "emacsclient", "vi", "vim":
+		cmd = fmt.Sprintf("%s -n +%d %s", editor, lm.Line, fm.Filename)
+	case "code", "Code.exe", "code.exe":
+		cmd = fmt.Sprintf("%s --goto %s:%d", editor, fm.Filename, lm.Line)
+	}
+	return fmt.Sprintf(`alias %v="%s"`, i, cmd)
 }
 
 // ls returns a list of files based on the given pattern. Empty string means
