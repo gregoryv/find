@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
-- Add flag --aliases
+- Add option --alias-prefix
+- Add flag --write-aliases
 
 ## [0.5.0] - 2022-04-12
 

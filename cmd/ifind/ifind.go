@@ -23,7 +23,8 @@ func main() {
 		files         = filesOpt.String("")
 		colors        = cli.Flag("-c, --colors")
 		includeBinary = cli.Flag("-i, --include-binary")
-		writeAliases  = cli.Flag("-a, --aliases")
+		writeAliases  = cli.Flag("-w, --write-aliases")
+		aliasPrefix   = cli.Option("-a, --alias-prefix").String("")
 		expr          = cli.Required("EXPR").String("")
 		openIndex     = cli.Optional("OPEN_INDEX").String("")
 	)
@@ -62,7 +63,7 @@ func main() {
 		var i int
 		for _, fm := range s.LastResult() {
 			for _, lm := range fm.Result {
-				fmt.Fprintln(w, aliasLine(i+1, fm, lm))
+				fmt.Fprintln(w, aliasLine(i+1, aliasPrefix, fm, lm))
 				i++
 			}
 		}
@@ -123,7 +124,7 @@ func main() {
 	}
 }
 
-func aliasLine(i int, fm FileMatch, lm LineMatch) string {
+func aliasLine(i int, prefix string, fm FileMatch, lm LineMatch) string {
 	editor := os.Getenv("EDITOR")
 
 	var cmd string
@@ -133,7 +134,7 @@ func aliasLine(i int, fm FileMatch, lm LineMatch) string {
 	case "code", "Code.exe", "code.exe":
 		cmd = fmt.Sprintf("%s --goto %s:%d", editor, fm.Filename, lm.Line)
 	}
-	return fmt.Sprintf(`alias %v="%s"`, i, cmd)
+	return fmt.Sprintf(`alias %s%v="%s"`, prefix, i, cmd)
 }
 
 // ls returns a list of files based on the given pattern. Empty string means
