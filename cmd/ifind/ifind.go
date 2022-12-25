@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,7 +24,7 @@ func main() {
 		files         = filesOpt.String("")
 		colors        = cli.Flag("-c, --colors")
 		includeBinary = cli.Flag("-i, --include-binary")
-		writeAliases  = cli.Flag("-w, --write-aliases")
+		writeAliases  = cli.Option("-w, --write-aliases").String("")
 		aliasPrefix   = cli.Option("-a, --alias-prefix").String("")
 		expr          = cli.Required("EXPR").String("")
 		openIndex     = cli.Optional("OPEN_INDEX").String("")
@@ -59,8 +60,13 @@ func main() {
 	// Write results here
 	w := os.Stdout
 
-	if writeAliases {
+	if writeAliases != "" {
 		var i int
+		w, err := os.Create(writeAliases)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer w.Close()
 		for _, fm := range s.LastResult() {
 			for _, lm := range fm.Result {
 				fmt.Fprintln(w, aliasLine(i+1, aliasPrefix, fm, lm))
