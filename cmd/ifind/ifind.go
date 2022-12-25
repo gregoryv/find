@@ -73,7 +73,6 @@ func main() {
 				i++
 			}
 		}
-		os.Exit(0)
 	}
 
 	if openIndex == "" { // list result
