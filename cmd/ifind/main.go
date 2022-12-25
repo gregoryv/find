@@ -29,8 +29,8 @@ func main() {
 		excludeExt    = cli.Option("-e, --exclude-extensions, $IFIND_EXCLUDE_EXT",
 			"Comma separated list of extensions including the dot").String(".pdf,.svg")
 		verbose   = cli.Flag("--verbose")
-		expr      = cli.Required("EXPR").String("")
-		openIndex = cli.Optional("OPEN_INDEX").String("")
+		expr      = cli.NamedArg("EXPR").String("")
+		openIndex = cli.NamedArg("OPEN_INDEX").String("")
 	)
 	filesOpt.Doc(
 		"Empty means current working directory and recursive.",
