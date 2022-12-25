@@ -14,3 +14,5 @@ See [package examples](https://godoc.org/github.com/gregoryv/find#pkg-examples)!
     $ ifind --help
 
 ifind supports emacs and vi editors when opening to specific line.
+
+![](ifind_usage.gif)
