@@ -26,8 +26,10 @@ func main() {
 		includeBinary = cli.Flag("-i, --include-binary")
 		writeAliases  = cli.Option("-w, --write-aliases").String("")
 		aliasPrefix   = cli.Option("-a, --alias-prefix").String("")
-		expr          = cli.Required("EXPR").String("")
-		openIndex     = cli.Optional("OPEN_INDEX").String("")
+		excludeExt    = cli.Option("-e, --exclude-extensions, $IFIND_EXCLUDE_EXT",
+			"Comma separated list of extensions including the dot").String(".pdf,.svg")
+		expr      = cli.Required("EXPR").String("")
+		openIndex = cli.Optional("OPEN_INDEX").String("")
 	)
 	filesOpt.Doc(
 		"Empty means current working directory and recursive.",
@@ -48,6 +50,7 @@ func main() {
 	s := NewScanner()
 	filter := &smart{}
 	filter.SetIncludeBinary(includeBinary)
+	filter.SetExcludeExt(excludeExt)
 	s.SetFiles(
 		ls(files, filter),
 	)
@@ -163,10 +166,19 @@ func ls(pattern string, filter find.Matcher) []string {
 
 type smart struct {
 	includeBinary bool
+	excludeExt    map[string]bool
 }
 
 func (me *smart) SetIncludeBinary(v bool) {
 	me.includeBinary = v
+}
+
+func (me *smart) SetExcludeExt(v string) {
+	me.excludeExt = make(map[string]bool)
+	for _, ext := range strings.Split(v, ",") {
+		ext = strings.TrimSpace(ext)
+		me.excludeExt[ext] = true
+	}
 }
 
 // Match excludes git project files, e.g. .git/
@@ -175,6 +187,8 @@ func (me *smart) Match(path string) bool {
 	case strings.HasPrefix(path, ".git/"):
 		return false
 	case !me.includeBinary && binext.IsBinary(path):
+		return false
+	case me.excludeExt[filepath.Ext(path)]:
 		return false
 	default:
 		return true
