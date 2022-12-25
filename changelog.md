@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
+- Add option --verbose
 - Add option --exclude-extensions, $IFIND_EXCLUDE_EXT
 - Add option --alias-prefix
 - Add option --write-aliases

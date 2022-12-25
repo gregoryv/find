@@ -28,6 +28,7 @@ func main() {
 		aliasPrefix   = cli.Option("-a, --alias-prefix").String("")
 		excludeExt    = cli.Option("-e, --exclude-extensions, $IFIND_EXCLUDE_EXT",
 			"Comma separated list of extensions including the dot").String(".pdf,.svg")
+		verbose   = cli.Flag("--verbose")
 		expr      = cli.Required("EXPR").String("")
 		openIndex = cli.Optional("OPEN_INDEX").String("")
 	)
@@ -48,6 +49,9 @@ func main() {
 	cli.Parse()
 
 	s := NewScanner()
+	if verbose {
+		s.Logger.SetOutput(log.Writer())
+	}
 	filter := &smart{}
 	filter.SetIncludeBinary(includeBinary)
 	filter.SetExcludeExt(excludeExt)
