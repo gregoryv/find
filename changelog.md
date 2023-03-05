@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
+- Consider files without extension, but with x perm set, as binary
 - Replace --exclude-extension flag with --exclude using regexp
 
 ## [0.6.0] - 2022-12-25

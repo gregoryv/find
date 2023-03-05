@@ -25,9 +25,14 @@ func main() {
 		files         = filesOpt.String("")
 		colors        = cli.Flag("-c, --colors")
 		includeBinary = cli.Flag("-i, --include-binary")
-		writeAliases  = cli.Option("-w, --write-aliases").String("")
-		aliasPrefix   = cli.Option("-a, --alias-prefix").String("")
-		exclude       = cli.Option("-e, --exclude, $IFIND_EXCLUDE_REGEXP",
+		writeAliases  = cli.Option("-w, --write-aliases",
+			"Output file for search result aliases for shell sourcing",
+		).String("")
+		aliasPrefix = cli.Option("-a, --alias-prefix",
+			`Use together with -w to prefix numbered aliases
+	e.g -w -a t results in alias t1=...`,
+		).String("")
+		exclude = cli.Option("-e, --exclude, $IFIND_EXCLUDE_REGEXP",
 			"Regexp for excluding paths").String("^.git/|(pdf|svg)$")
 		verbose   = cli.Flag("--verbose")
 		expr      = cli.NamedArg("EXPR").String("")
@@ -192,14 +197,16 @@ func (me *smart) SetExclude(v string) error {
 
 // Match excludes git project files, e.g. .git/
 func (me *smart) Match(path string) bool {
-	switch {
-	case me.exclude.MatchString(path):
-		return false
-	case !me.includeBinary && binext.IsBinary(path):
-		return false
-	default:
-		return true
+	var executableFile bool
+	if filepath.Ext(path) == "" {
+		i, _ := os.Stat(path)
+		executableFile = (i.Mode()&0111 != 0 && i.Mode().IsRegular())
 	}
+
+	if !me.includeBinary && (binext.IsBinary(path) || executableFile) {
+		return false
+	}
+	return !me.exclude.MatchString(path)
 }
 
 var (
