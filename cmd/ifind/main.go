@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -26,8 +27,8 @@ func main() {
 		includeBinary = cli.Flag("-i, --include-binary")
 		writeAliases  = cli.Option("-w, --write-aliases").String("")
 		aliasPrefix   = cli.Option("-a, --alias-prefix").String("")
-		excludeExt    = cli.Option("-e, --exclude-extensions, $IFIND_EXCLUDE_EXT",
-			"Comma separated list of extensions including the dot").String(".pdf,.svg")
+		exclude       = cli.Option("-e, --exclude, $IFIND_EXCLUDE_REGEXP",
+			"Regexp for excluding paths").String("^.git/|(pdf|svg)$")
 		verbose   = cli.Flag("--verbose")
 		expr      = cli.NamedArg("EXPR").String("")
 		openIndex = cli.NamedArg("OPEN_INDEX").String("")
@@ -54,7 +55,10 @@ func main() {
 	}
 	filter := &smart{}
 	filter.SetIncludeBinary(includeBinary)
-	filter.SetExcludeExt(excludeExt)
+	if err := filter.SetExclude(exclude); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	s.SetFiles(
 		ls(files, filter),
 	)
@@ -170,29 +174,28 @@ func ls(pattern string, filter find.Matcher) []string {
 
 type smart struct {
 	includeBinary bool
-	excludeExt    map[string]bool
+	exclude       *regexp.Regexp
 }
 
 func (me *smart) SetIncludeBinary(v bool) {
 	me.includeBinary = v
 }
 
-func (me *smart) SetExcludeExt(v string) {
-	me.excludeExt = make(map[string]bool)
-	for _, ext := range strings.Split(v, ",") {
-		ext = strings.TrimSpace(ext)
-		me.excludeExt[ext] = true
+func (me *smart) SetExclude(v string) error {
+	re, err := regexp.Compile(v)
+	if err != nil {
+		return err
 	}
+	me.exclude = re
+	return nil
 }
 
 // Match excludes git project files, e.g. .git/
 func (me *smart) Match(path string) bool {
 	switch {
-	case strings.HasPrefix(path, ".git/"):
+	case me.exclude.MatchString(path):
 		return false
 	case !me.includeBinary && binext.IsBinary(path):
-		return false
-	case me.excludeExt[filepath.Ext(path)]:
 		return false
 	default:
 		return true
