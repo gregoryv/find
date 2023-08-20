@@ -90,7 +90,7 @@ func main() {
 
 	// results destination
 	w := os.Stdout
-	
+
 	if openIndex == "" { // list result
 		var i int
 		for _, fm := range s.LastResult() {
