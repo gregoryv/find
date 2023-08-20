@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
+- Use specific files or glob files after expression
 - Allow combine short flags, e.g. -cv over -c -v
 
 ## [0.7.0] - 2023-03-05

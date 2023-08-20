@@ -29,8 +29,9 @@ type Input struct {
 	Expression string
 	OpenIndex  uint32
 
-	Files   string // glob expression
+	Glob    string // glob expression
 	Exclude string
+	Files []string
 
 	WriteAliases string
 	AliasPrefix  string
@@ -51,7 +52,7 @@ func (in *Input) SetArg(option, value string) (err error) {
 		err = parseBool(&in.Verbose, value)
 
 	case "-f", "--files":
-		in.Files = value
+		in.Glob = value
 
 	case "-w", "--write-alias":
 		in.WriteAliases = value
@@ -65,8 +66,13 @@ func (in *Input) SetArg(option, value string) (err error) {
 	case "":
 		if in.Expression == "" {
 			in.Expression = value
-		} else {
-			err = parseUint32(&in.OpenIndex, value)
+			return nil
+		}
+		// if it's not a number assume it's a file.  Limitation files
+		// named as numbers only cannot be specified like this. Use -f
+		// for that.
+		if err := parseUint32(&in.OpenIndex, value); err != nil {
+			in.Files = append(in.Files, value)
 		}
 
 	default:
@@ -75,7 +81,7 @@ func (in *Input) SetArg(option, value string) (err error) {
 	return
 }
 
-const usage = `Usage: {{.Cmd}} [OPTIONS] EXPR OPEN_INDEX
+const usage = `Usage: {{.Cmd}} [OPTIONS] EXPR [FILE...] [OPEN_INDEX]
 
 ifind - grep expression and quick open indexed result
 
@@ -83,6 +89,7 @@ Options
     -f, --files : ""
         Empty means current working directory and recursive.
         The pattern is a glob format like *.go or *.txt
+        Alternatively specify files after the expression.
 
     -c, --colors
     -i, --include-binary
@@ -102,9 +109,11 @@ Options
 Examples
     Look for EXPR in all text files
         $ ifind -f *.txt EXPR
+    or
+        $ ifind EXPR *.txt
 
     Open the third match
-        $ EDITOR=emacsclient ifind -f *.txt EXPR 3
+        $ EDITOR=emacsclient ifind EXPR 3
 
 `
 

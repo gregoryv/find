@@ -19,7 +19,7 @@ func main() {
 	if err := cli.Parse(in, os.Args); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	}	
+	}
 
 	if in.Help {
 		WriteUsage(os.Stdout)
@@ -30,7 +30,7 @@ func main() {
 		fmt.Println("empty EXPR")
 		os.Exit(1)
 	}
-	
+
 	s := NewScanner()
 	if in.Verbose {
 		s.Logger.SetOutput(log.Writer())
@@ -41,9 +41,13 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	s.SetFiles(
-		ls(in.Files, filter),
-	)
+	if len(in.Files) > 0 {
+		s.SetFiles(in.Files)
+	} else {
+		s.SetFiles(
+			ls(in.Glob, filter),
+		)
+	}
 
 	if err := s.Scan(in.Expression); err != nil {
 		fmt.Println(err)

@@ -2,11 +2,12 @@ package find_test
 
 import (
 	"container/list"
-	"github.com/gregoryv/find"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/gregoryv/find"
 
 	"github.com/gregoryv/asserter"
 )
