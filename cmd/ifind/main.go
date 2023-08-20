@@ -7,81 +7,51 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/gregoryv/binext"
-	"github.com/gregoryv/cmdline"
+	"github.com/gregoryv/cli"
 	"github.com/gregoryv/find"
 )
 
 func main() {
-	cli := cmdline.NewBasicParser()
-	cli.Preface(
-		"ifind - grep expression and quick open indexed result",
-	)
-	var (
-		filesOpt      = cli.Option("-f, --files")
-		files         = filesOpt.String("")
-		colors        = cli.Flag("-c, --colors")
-		includeBinary = cli.Flag("-i, --include-binary")
-		writeAliases  = cli.Option("-w, --write-aliases",
-			"Output file for search result aliases for shell sourcing",
-		).String("")
-		aliasPrefix = cli.Option("-a, --alias-prefix",
-			`Use together with -w to prefix numbered aliases
-	e.g -w -a t results in alias t1=...`,
-		).String("")
-		exclude = cli.Option("-e, --exclude, $IFIND_EXCLUDE_REGEXP",
-			"Regexp for excluding paths").String("^.git/|(pdf|svg)$")
-		verbose   = cli.Flag("--verbose")
-		expr      = cli.NamedArg("EXPR").String("")
-		openIndex = cli.NamedArg("OPEN_INDEX").String("")
-	)
-	filesOpt.Doc(
-		"Empty means current working directory and recursive.",
-		"The pattern is a glob format like *.go or *.txt",
-	)
-	u := cli.Usage()
-	u.Example(
-		"Look for EXPR in all text files",
-		"    $ ifind -f *.txt EXPR",
-	)
-	u.Example(
-		"Open the third match",
-		"    $ EDITOR=emacsclient ifind -f *.txt EXPR 3",
-	)
-
-	cli.Parse()
-
+	in := NewInput()
+	if err := cli.Parse(in, os.Args); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	s := NewScanner()
-	if verbose {
+	if in.Help {
+		WriteUsage(os.Stdout)
+		os.Exit(0)
+	}
+	if in.Verbose {
 		s.Logger.SetOutput(log.Writer())
 	}
 	filter := &smart{}
-	filter.SetIncludeBinary(includeBinary)
-	if err := filter.SetExclude(exclude); err != nil {
+	filter.SetIncludeBinary(in.IncludeBinary)
+	if err := filter.SetExclude(in.Exclude); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	s.SetFiles(
-		ls(files, filter),
+		ls(in.Files, filter),
 	)
 
-	if err := s.Scan(expr); err != nil {
+	if err := s.Scan(in.Expression); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	if writeAliases != "" {
+	if in.WriteAliases != "" {
 		var i int
-		aw, err := os.Create(writeAliases)
+		aw, err := os.Create(in.WriteAliases)
 		if err != nil {
 			log.Fatal(err)
 		}
 		for _, fm := range s.LastResult() {
 			for _, lm := range fm.Result {
-				fmt.Fprintln(aw, aliasLine(i+1, aliasPrefix, fm, lm))
+				fmt.Fprintln(aw, aliasLine(i+1, in.AliasPrefix, fm, lm))
 				i++
 			}
 		}
@@ -91,15 +61,15 @@ func main() {
 	// results destination
 	w := os.Stdout
 
-	if openIndex == "" { // list result
+	if in.OpenIndex == 0 { // list result
 		var i int
 		for _, fm := range s.LastResult() {
 			fmt.Fprintln(w, fm.Filename)
 			for _, m := range fm.Result {
 				text := m.Text
-				if colors {
-					colored := fmt.Sprintf("%s%s%s", green, expr, reset)
-					text = strings.ReplaceAll(text, expr, colored)
+				if in.Colors {
+					colored := fmt.Sprintf("%s%s%s", green, in.Expression, reset)
+					text = strings.ReplaceAll(text, in.Expression, colored)
 				}
 				fmt.Fprintln(w, i+1, text)
 				i++
@@ -109,16 +79,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	oi, err := strconv.Atoi(openIndex)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	var i int
+	var i uint32
 	for _, fm := range s.LastResult() {
 		for _, lm := range fm.Result {
 			i++
-			if i == oi {
+			if i == in.OpenIndex {
 				editor := os.Getenv("EDITOR")
 				// Adapt command to open on a specific line
 				var cmd *exec.Cmd

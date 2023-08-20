@@ -21,12 +21,13 @@ func NewInput() *Input {
 }
 
 type Input struct {
-	Help    bool
-	Colors  bool
-	Verbose bool
+	Help          bool
+	Colors        bool
+	Verbose       bool
+	IncludeBinary bool
 
 	Expression string
-	Open       uint32
+	OpenIndex  uint32
 
 	Files   string // glob expression
 	Exclude string
@@ -42,6 +43,12 @@ func (in *Input) SetArg(option, value string) (err error) {
 
 	case "-c", "--colors":
 		err = parseBool(&in.Colors, value)
+
+	case "-i", "--include-binary":
+		err = parseBool(&in.IncludeBinary, value)
+
+	case "--verbose":
+		err = parseBool(&in.Verbose, value)
 
 	case "-f", "--files":
 		in.Files = value
@@ -59,7 +66,7 @@ func (in *Input) SetArg(option, value string) (err error) {
 		if in.Expression == "" {
 			in.Expression = value
 		} else {
-			err = parseUint32(&in.Open, value)
+			err = parseUint32(&in.OpenIndex, value)
 		}
 
 	default:
