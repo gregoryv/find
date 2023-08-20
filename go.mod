@@ -6,6 +6,7 @@ require (
 	github.com/gregoryv/asserter v0.4.2
 	github.com/gregoryv/binext v0.2.0
 	github.com/gregoryv/cli v0.2.0
+	github.com/gregoryv/dst v0.2.0
 	github.com/gregoryv/qual v0.4.2
 )
 

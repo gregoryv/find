@@ -1,13 +1,12 @@
 package main
 
 import (
-	"errors"
 	"io"
 	"os"
-	"strconv"
 	"text/template"
 
 	"github.com/gregoryv/cli"
+	"github.com/gregoryv/dst"
 )
 
 func NewInput() *Input {
@@ -31,7 +30,7 @@ type Input struct {
 
 	Glob    string // glob expression
 	Exclude string
-	Files []string
+	Files   []string
 
 	WriteAliases string
 	AliasPrefix  string
@@ -40,16 +39,16 @@ type Input struct {
 func (in *Input) SetArg(option, value string) (err error) {
 	switch option {
 	case "-h", "--help":
-		err = parseBool(&in.Help, value)
+		err = dst.SetBool(&in.Help, value)
 
 	case "-c", "--colors":
-		err = parseBool(&in.Colors, value)
+		err = dst.SetBool(&in.Colors, value)
 
 	case "-i", "--include-binary":
-		err = parseBool(&in.IncludeBinary, value)
+		err = dst.SetBool(&in.IncludeBinary, value)
 
 	case "-v", "--verbose":
-		err = parseBool(&in.Verbose, value)
+		err = dst.SetBool(&in.Verbose, value)
 
 	case "-f", "--files":
 		in.Glob = value
@@ -71,7 +70,7 @@ func (in *Input) SetArg(option, value string) (err error) {
 		// if it's not a number assume it's a file.  Limitation files
 		// named as numbers only cannot be specified like this. Use -f
 		// for that.
-		if err := parseUint32(&in.OpenIndex, value); err != nil {
+		if err := dst.SetUint32(&in.OpenIndex, value); err != nil {
 			in.Files = append(in.Files, value)
 		}
 
@@ -124,26 +123,3 @@ func WriteUsage(w io.Writer) {
 }
 
 var usageTmpl = template.Must(template.New("").Parse(usage))
-
-// empty value means true, otherwise strconv.ParseBool is used
-func parseBool(dst *bool, value string) error {
-	if value == "" {
-		*dst = true
-		return nil
-	}
-	tmp, err := strconv.ParseBool(value)
-	if err != nil {
-		return errors.Unwrap(err)
-	}
-	*dst = tmp
-	return nil
-}
-
-func parseUint32(dst *uint32, value string) error {
-	tmp, err := strconv.ParseUint(value, 10, 32)
-	if err != nil {
-		return errors.Unwrap(err)
-	}
-	*dst = uint32(tmp)
-	return nil
-}
