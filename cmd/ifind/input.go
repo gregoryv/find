@@ -47,7 +47,7 @@ func (in *Input) SetArg(option, value string) (err error) {
 	case "-i", "--include-binary":
 		err = parseBool(&in.IncludeBinary, value)
 
-	case "--verbose":
+	case "-v", "--verbose":
 		err = parseBool(&in.Verbose, value)
 
 	case "-f", "--files":
@@ -96,7 +96,7 @@ Options
     -e, --exclude, $IFIND_EXCLUDE_REGEXP : "^.git/|(pdf|svg)$"
         Regexp for excluding paths
 
-    --verbose
+    -v, --verbose
     -h, --help
 
 Examples

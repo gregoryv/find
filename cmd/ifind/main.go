@@ -20,11 +20,18 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	s := NewScanner()
+
+	if in.Expression == "" {
+		fmt.Println("empty EXPR")
+		os.Exit(1)
+	}
+
 	if in.Help {
 		WriteUsage(os.Stdout)
-		os.Exit(0)
+		return
 	}
+
+	s := NewScanner()
 	if in.Verbose {
 		s.Logger.SetOutput(log.Writer())
 	}
@@ -83,31 +90,34 @@ func main() {
 	for _, fm := range s.LastResult() {
 		for _, lm := range fm.Result {
 			i++
-			if i == in.OpenIndex {
-				editor := os.Getenv("EDITOR")
-				// Adapt command to open on a specific line
-				var cmd *exec.Cmd
-				switch editor {
-				case "emacs", "emacsclient", "vi", "vim":
-					cmd = exec.Command(
-						editor, "-n", fmt.Sprintf("+%d", lm.Line), fm.Filename,
-					)
-				case "code", "Code.exe", "code.exe":
-					cmd = exec.Command(
-						editor, "--goto", fmt.Sprintf("%s:%d", fm.Filename, lm.Line),
-					)
-				default:
-					cmd = exec.Command(editor, fm.Filename)
-				}
-				err := cmd.Start()
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-				os.Exit(0)
+			if i != in.OpenIndex {
+				continue
 			}
+			editor := os.Getenv("EDITOR")
+			// Adapt command to open on a specific line
+			var cmd *exec.Cmd
+			switch editor {
+			case "emacs", "emacsclient", "vi", "vim":
+				cmd = exec.Command(
+					editor, "-n", fmt.Sprintf("+%d", lm.Line), fm.Filename,
+				)
+			case "code", "Code.exe", "code.exe":
+				cmd = exec.Command(
+					editor, "--goto", fmt.Sprintf("%s:%d", fm.Filename, lm.Line),
+				)
+			default:
+				cmd = exec.Command(editor, fm.Filename)
+			}
+			err := cmd.Start()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			return
 		}
 	}
+	fmt.Printf("%v? there are only %v matches\n", in.OpenIndex, i)
+	os.Exit(1)
 }
 
 func aliasLine(i int, prefix string, fm FileMatch, lm LineMatch) string {
