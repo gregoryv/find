@@ -73,24 +73,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Write results here
-	w := os.Stdout
-
 	if writeAliases != "" {
 		var i int
-		w, err := os.Create(writeAliases)
+		aw, err := os.Create(writeAliases)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer w.Close()
 		for _, fm := range s.LastResult() {
 			for _, lm := range fm.Result {
-				fmt.Fprintln(w, aliasLine(i+1, aliasPrefix, fm, lm))
+				fmt.Fprintln(aw, aliasLine(i+1, aliasPrefix, fm, lm))
 				i++
 			}
 		}
+		aw.Close()
 	}
 
+	// results destination
+	w := os.Stdout
+	
 	if openIndex == "" { // list result
 		var i int
 		for _, fm := range s.LastResult() {
