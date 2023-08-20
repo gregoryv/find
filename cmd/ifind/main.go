@@ -19,18 +19,18 @@ func main() {
 	if err := cli.Parse(in, os.Args); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	}
-
-	if in.Expression == "" {
-		fmt.Println("empty EXPR")
-		os.Exit(1)
-	}
+	}	
 
 	if in.Help {
 		WriteUsage(os.Stdout)
 		return
 	}
 
+	if in.Expression == "" {
+		fmt.Println("empty EXPR")
+		os.Exit(1)
+	}
+	
 	s := NewScanner()
 	if in.Verbose {
 		s.Logger.SetOutput(log.Writer())
