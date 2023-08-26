@@ -67,7 +67,6 @@ func (me *Scanner) LastResult() []FileMatch {
 
 // Files returns a filtered list of files
 func (me *Scanner) Files() []string {
-	// todo
 	return me.files
 }
 
