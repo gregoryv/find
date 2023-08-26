@@ -78,6 +78,7 @@ func main() {
 	e.StringVar(&exclude, excludeDef, "IFIND_EXCLUDE_REGEXP")
 
 	var verbose bool
+	f.BoolVar(&verbose, "v", false, "")	
 	f.BoolVar(&verbose, "verbose", false, "")
 
 	f.Usage = func() {
