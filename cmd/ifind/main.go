@@ -1,68 +1,113 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/gregoryv/binext"
-	"github.com/gregoryv/cli"
 	"github.com/gregoryv/find"
 )
 
 func main() {
-	in := NewInput()
-	if err := cli.Parse(in, os.Args); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+
+	flag := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
+	var colors bool
+	flag.BoolVar(&colors, "c", false, "")
+	flag.BoolVar(&colors, "color", false, "")
+
+	var includeBinary bool
+	flag.BoolVar(&includeBinary, "i", false, "")
+	flag.BoolVar(&includeBinary, "include-binary", false, "")
+
+	var writeAliases string
+	usage := "Output file for search result aliases for shell sourcing"
+	flag.StringVar(&writeAliases, "w", "", usage)
+	flag.StringVar(&writeAliases, "write-aliases", "", usage)
+
+	var aliasPrefix string
+	usage = `Use together with -w to prefix numbered aliases
+	e.g -w -a t results in alias t1=...`
+	flag.StringVar(&aliasPrefix, "a", "", usage)
+	flag.StringVar(&aliasPrefix, "alias-prefix", "", usage)
+
+	var exclude string = "^.git/|(pdf|svg)$"
+	usage = "Regexp for excluding paths"
+	flag.StringVar(&exclude, "e", exclude, usage)
+	flag.StringVar(&exclude, "exclude", exclude, usage)
+
+	var verbose bool
+	flag.BoolVar(&verbose, "verbose", false, "")
+
+	flag.Parse(os.Args[1:])
+	rest := flag.Args()
+
+	log.SetFlags(0)
+	if len(rest) == 0 {
+		log.Fatal("missing expression")
 	}
 
-	if in.Help {
-		WriteUsage(os.Stdout)
-		return
+	expr := rest[0]
+	rest = rest[1:]
+
+	var index int
+	if len(rest) > 0 {
+		last := len(rest) - 1
+		var err error
+		index, err = strconv.Atoi(rest[last])
+		if err == nil {
+			// last is index
+			rest = rest[:last]
+		}
 	}
 
-	if in.Expression == "" {
+	// ----------------------------------------
+
+	if expr == "" {
 		fmt.Println("empty EXPR")
 		os.Exit(1)
 	}
 
 	s := NewScanner()
-	if in.Verbose {
+	if verbose {
 		s.Logger.SetOutput(log.Writer())
 	}
 	filter := &smart{}
-	filter.SetIncludeBinary(in.IncludeBinary)
-	if err := filter.SetExclude(in.Exclude); err != nil {
+	filter.SetIncludeBinary(includeBinary)
+	if err := filter.SetExclude(exclude); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	if len(in.Files) > 0 {
-		s.SetFiles(in.Files)
+
+	if len(rest) > 0 {
+		s.SetFiles(rest)
 	} else {
 		s.SetFiles(
-			ls(in.Glob, filter),
+			ls("", filter),
 		)
 	}
 
-	if err := s.Scan(in.Expression); err != nil {
+	if err := s.Scan(expr); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	if in.WriteAliases != "" {
+	if writeAliases != "" {
 		var i int
-		aw, err := os.Create(in.WriteAliases)
+		aw, err := os.Create(writeAliases)
 		if err != nil {
 			log.Fatal(err)
 		}
 		for _, fm := range s.LastResult() {
 			for _, lm := range fm.Result {
-				fmt.Fprintln(aw, aliasLine(i+1, in.AliasPrefix, fm, lm))
+				fmt.Fprintln(aw, aliasLine(i+1, aliasPrefix, fm, lm))
 				i++
 			}
 		}
@@ -72,29 +117,29 @@ func main() {
 	// results destination
 	w := os.Stdout
 
-	if in.OpenIndex == 0 { // list result
+	if index == 0 { // list result
 		var i int
 		for _, fm := range s.LastResult() {
 			fmt.Fprintln(w, fm.Filename)
 			for _, m := range fm.Result {
 				text := m.Text
-				if in.Colors {
-					colored := fmt.Sprintf("%s%s%s", green, in.Expression, reset)
-					text = strings.ReplaceAll(text, in.Expression, colored)
+				if colors {
+					colored := fmt.Sprintf("%s%s%s", green, expr, reset)
+					text = strings.ReplaceAll(text, expr, colored)
 				}
 				fmt.Fprintln(w, i+1, text)
 				i++
 			}
 			fmt.Fprintln(w)
 		}
-		os.Exit(0)
+		return
 	}
 
-	var i uint32
+	var i int
 	for _, fm := range s.LastResult() {
 		for _, lm := range fm.Result {
 			i++
-			if i != in.OpenIndex {
+			if i != index {
 				continue
 			}
 			editor := os.Getenv("EDITOR")
@@ -120,7 +165,7 @@ func main() {
 			return
 		}
 	}
-	fmt.Printf("%v? there are only %v matches\n", in.OpenIndex, i)
+	fmt.Printf("%v? there are only %v matches\n", index, i)
 	os.Exit(1)
 }
 
@@ -153,6 +198,7 @@ func ls(pattern string, filter find.Matcher) []string {
 			files = append(files, filename)
 		}
 	}
+	fmt.Println("ls", files)
 	return files
 }
 
