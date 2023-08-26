@@ -54,7 +54,7 @@ Examples
 var f = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 func main() {
-
+	var e Envs	
 	var colors bool
 	f.BoolVar(&colors, "color", false, "")
 	f.BoolVar(&colors, "c", false, "")
@@ -75,7 +75,7 @@ func main() {
 	var excludeDef = "^.git/|(pdf|svg)$"
 	f.StringVar(&exclude, "e", excludeDef, "")
 	f.StringVar(&exclude, "exclude", excludeDef, "")
-	envs.StringVar(&exclude, excludeDef, "IFIND_EXCLUDE_REGEXP")
+	e.StringVar(&exclude, excludeDef, "IFIND_EXCLUDE_REGEXP")
 
 	var verbose bool
 	f.BoolVar(&verbose, "verbose", false, "")
@@ -94,7 +94,7 @@ func main() {
 	// find expression
 	rest := f.Args()
 	if len(rest) == 0 {
-		log.Fatal("missing expression")
+		log.Fatal("missing EXPR, try --help")
 	}
 	expr := rest[0]
 	rest = rest[1:]
