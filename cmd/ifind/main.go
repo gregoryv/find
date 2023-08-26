@@ -67,15 +67,13 @@ func main() {
 
 	var aliasPrefix string
 	flag.StringVar(&aliasPrefix, "a", "", "")
-	flag.StringVar(&aliasPrefix, "alias-prefix", "", usage)
+	flag.StringVar(&aliasPrefix, "alias-prefix", "", "")
 
 	var exclude string
 	var excludeDef = "^.git/|(pdf|svg)$"
 	flag.StringVar(&exclude, "e", excludeDef, "")
-	flag.StringVar(&exclude, "exclude", excludeDef, usage)
-	if v := os.Getenv("IFIND_EXCLUDE_REGEXP"); v != "" && exclude == excludeDef {
-		exclude = v
-	}
+	flag.StringVar(&exclude, "exclude", excludeDef, "")
+	envs.StringVar(&exclude, excludeDef, "IFIND_EXCLUDE_REGEXP")
 
 	var verbose bool
 	flag.BoolVar(&verbose, "verbose", false, "")
