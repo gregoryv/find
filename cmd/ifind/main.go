@@ -14,6 +14,7 @@ import (
 
 	"github.com/gregoryv/binext"
 	"github.com/gregoryv/find"
+	"github.com/gregoryv/options"	
 )
 
 var usageTmpl = template.Must(template.New("").Parse(usage))
@@ -51,35 +52,35 @@ Examples
 `
 
 // keep it outside so we can verify usage content to the actual flags
-var f = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+var f = options.New(flag.NewFlagSet(os.Args[0], flag.ExitOnError))
 
 func main() {
 	var e Envs	
 	var colors bool
-	f.BoolVar(&colors, "color", false, "")
-	f.BoolVar(&colors, "c", false, "")
+	f.BoolVar(&colors, "color", false)
+	f.BoolVar(&colors, "c", false)
 
 	var includeBinary bool
-	f.BoolVar(&includeBinary, "include-binary", false, "")
-	f.BoolVar(&includeBinary, "i", false, "")
+	f.BoolVar(&includeBinary, "include-binary", false)
+	f.BoolVar(&includeBinary, "i", false)
 
 	var writeAliases string
-	f.StringVar(&writeAliases, "w", "", "")
-	f.StringVar(&writeAliases, "write-aliases", "", "")
+	f.StringVar(&writeAliases, "w", "")
+	f.StringVar(&writeAliases, "write-aliases", "")
 
 	var aliasPrefix string
-	f.StringVar(&aliasPrefix, "a", "", "")
-	f.StringVar(&aliasPrefix, "alias-prefix", "", "")
+	f.StringVar(&aliasPrefix, "a", "")
+	f.StringVar(&aliasPrefix, "alias-prefix", "")
 
 	var exclude string
 	var excludeDef = "^.git/|(pdf|svg)$"
-	f.StringVar(&exclude, "e", excludeDef, "")
-	f.StringVar(&exclude, "exclude", excludeDef, "")
+	f.StringVar(&exclude, "e", excludeDef)
+	f.StringVar(&exclude, "exclude", excludeDef)
 	e.StringVar(&exclude, excludeDef, "IFIND_EXCLUDE_REGEXP")
 
 	var verbose bool
-	f.BoolVar(&verbose, "v", false, "")	
-	f.BoolVar(&verbose, "verbose", false, "")
+	f.BoolVar(&verbose, "v", false)	
+	f.BoolVar(&verbose, "verbose", false)
 
 	f.Usage = func() {
 		usageTmpl.Execute(os.Stdout, map[string]any{
