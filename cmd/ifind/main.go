@@ -50,47 +50,49 @@ Examples
 
 `
 
+// keep it outside so we can verify usage content to the actual flags
+var f = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
 func main() {
-	flag := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 	var colors bool
-	flag.BoolVar(&colors, "color", false, "")
-	flag.BoolVar(&colors, "c", false, "")
+	f.BoolVar(&colors, "color", false, "")
+	f.BoolVar(&colors, "c", false, "")
 
 	var includeBinary bool
-	flag.BoolVar(&includeBinary, "include-binary", false, "")
-	flag.BoolVar(&includeBinary, "i", false, "")
+	f.BoolVar(&includeBinary, "include-binary", false, "")
+	f.BoolVar(&includeBinary, "i", false, "")
 
 	var writeAliases string
-	flag.StringVar(&writeAliases, "w", "", "")
-	flag.StringVar(&writeAliases, "write-aliases", "", "")
+	f.StringVar(&writeAliases, "w", "", "")
+	f.StringVar(&writeAliases, "write-aliases", "", "")
 
 	var aliasPrefix string
-	flag.StringVar(&aliasPrefix, "a", "", "")
-	flag.StringVar(&aliasPrefix, "alias-prefix", "", "")
+	f.StringVar(&aliasPrefix, "a", "", "")
+	f.StringVar(&aliasPrefix, "alias-prefix", "", "")
 
 	var exclude string
 	var excludeDef = "^.git/|(pdf|svg)$"
-	flag.StringVar(&exclude, "e", excludeDef, "")
-	flag.StringVar(&exclude, "exclude", excludeDef, "")
+	f.StringVar(&exclude, "e", excludeDef, "")
+	f.StringVar(&exclude, "exclude", excludeDef, "")
 	envs.StringVar(&exclude, excludeDef, "IFIND_EXCLUDE_REGEXP")
 
 	var verbose bool
-	flag.BoolVar(&verbose, "verbose", false, "")
+	f.BoolVar(&verbose, "verbose", false, "")
 
-	flag.Usage = func() {
+	f.Usage = func() {
 		usageTmpl.Execute(os.Stdout, map[string]any{
 			"Cmd": os.Args[0],
 		})
 	}
 
 	// parse arguments
-	flag.Parse(os.Args[1:])
+	f.Parse(os.Args[1:])
 
 	log.SetFlags(0)
 
 	// find expression
-	rest := flag.Args()
+	rest := f.Args()
 	if len(rest) == 0 {
 		log.Fatal("missing expression")
 	}
