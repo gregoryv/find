@@ -10,95 +10,131 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"text/template"
 
 	"github.com/gregoryv/binext"
 	"github.com/gregoryv/find"
 )
 
-func main() {
+var usageTmpl = template.Must(template.New("").Parse(usage))
 
+const usage = `Usage: {{.Cmd}} [OPTIONS] EXPR [FILE...] [OPEN_INDEX]
+
+ifind - grep expression and quick open indexed result
+
+Options
+    -c, --colors
+    -i, --include-binary
+    -w, --write-aliases : ""
+        Output file for search result aliases for shell sourcing
+
+    -a, --alias-prefix : ""
+        Use together with -w to prefix numbered aliases
+        e.g -w -a t results in alias t1=...
+
+    -e, --exclude, $IFIND_EXCLUDE_REGEXP : "^.git/|(pdf|svg)$"
+        Regexp for excluding paths
+
+    -v, --verbose
+    -h, --help
+
+Examples
+    Look for EXPR in files recursively
+        $ ifind EXPR
+
+    or in specific files
+        $ ifind EXPR *.txt
+
+    Open the third match
+        $ EDITOR=emacsclient ifind EXPR 3
+
+`
+
+func main() {
 	flag := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 	var colors bool
-	flag.BoolVar(&colors, "c", false, "")
 	flag.BoolVar(&colors, "color", false, "")
+	flag.BoolVar(&colors, "c", false, "")
 
 	var includeBinary bool
-	flag.BoolVar(&includeBinary, "i", false, "")
 	flag.BoolVar(&includeBinary, "include-binary", false, "")
+	flag.BoolVar(&includeBinary, "i", false, "")
 
 	var writeAliases string
-	usage := "Output file for search result aliases for shell sourcing"
-	flag.StringVar(&writeAliases, "w", "", usage)
-	flag.StringVar(&writeAliases, "write-aliases", "", usage)
+	flag.StringVar(&writeAliases, "w", "", "")
+	flag.StringVar(&writeAliases, "write-aliases", "", "")
 
 	var aliasPrefix string
-	usage = `Use together with -w to prefix numbered aliases
-	e.g -w -a t results in alias t1=...`
-	flag.StringVar(&aliasPrefix, "a", "", usage)
+	flag.StringVar(&aliasPrefix, "a", "", "")
 	flag.StringVar(&aliasPrefix, "alias-prefix", "", usage)
 
-	var exclude string = "^.git/|(pdf|svg)$"
-	usage = "Regexp for excluding paths"
-	flag.StringVar(&exclude, "e", exclude, usage)
-	flag.StringVar(&exclude, "exclude", exclude, usage)
+	var exclude string
+	var excludeDef = "^.git/|(pdf|svg)$"
+	flag.StringVar(&exclude, "e", excludeDef, "")
+	flag.StringVar(&exclude, "exclude", excludeDef, usage)
+	if v := os.Getenv("IFIND_EXCLUDE_REGEXP"); v != "" && exclude == excludeDef {
+		exclude = v
+	}
 
 	var verbose bool
 	flag.BoolVar(&verbose, "verbose", false, "")
 
+	flag.Usage = func() {
+		usageTmpl.Execute(os.Stdout, map[string]any{
+			"Cmd": os.Args[0],
+		})
+	}
+
+	// parse arguments
 	flag.Parse(os.Args[1:])
-	rest := flag.Args()
 
 	log.SetFlags(0)
+
+	// find expression
+	rest := flag.Args()
 	if len(rest) == 0 {
 		log.Fatal("missing expression")
 	}
-
 	expr := rest[0]
 	rest = rest[1:]
 
+	// find optional index as final argument
 	var index int
 	if len(rest) > 0 {
 		last := len(rest) - 1
 		var err error
 		index, err = strconv.Atoi(rest[last])
 		if err == nil {
-			// last is index
+			// remaining arguments should be a list of files
 			rest = rest[:last]
 		}
 	}
 
-	// ----------------------------------------
-
-	if expr == "" {
-		fmt.Println("empty EXPR")
-		os.Exit(1)
-	}
-
+	// setup scanner
 	s := NewScanner()
 	if verbose {
 		s.Logger.SetOutput(log.Writer())
 	}
-	filter := &smart{}
-	filter.SetIncludeBinary(includeBinary)
-	if err := filter.SetExclude(exclude); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
 	if len(rest) > 0 {
 		s.SetFiles(rest)
 	} else {
-		s.SetFiles(
-			ls("", filter),
-		)
+		filter := &smart{}
+		filter.SetIncludeBinary(includeBinary)
+		if err := filter.SetExclude(exclude); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		s.SetFiles(ls(filter))
 	}
 
+	// scan for expression
 	if err := s.Scan(expr); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
+	// write out optional aliases file
 	if writeAliases != "" {
 		var i int
 		aw, err := os.Create(writeAliases)
@@ -114,10 +150,9 @@ func main() {
 		aw.Close()
 	}
 
-	// results destination
+	// list result
 	w := os.Stdout
-
-	if index == 0 { // list result
+	if index == 0 {
 		var i int
 		for _, fm := range s.LastResult() {
 			fmt.Fprintln(w, fm.Filename)
@@ -135,6 +170,7 @@ func main() {
 		return
 	}
 
+	// open selected indexed result
 	var i int
 	for _, fm := range s.LastResult() {
 		for _, lm := range fm.Result {
@@ -184,11 +220,7 @@ func aliasLine(i int, prefix string, fm FileMatch, lm LineMatch) string {
 
 // ls returns a list of files based on the given pattern. Empty string means
 // recursive from current working directory
-func ls(pattern string, filter find.Matcher) []string {
-	if pattern != "" {
-		f, _ := filepath.Glob(pattern)
-		return f
-	}
+func ls(filter find.Matcher) []string {
 	// recursive from current working directory
 	result, _ := find.ByName("*", ".")
 	files := make([]string, 0)
@@ -198,10 +230,12 @@ func ls(pattern string, filter find.Matcher) []string {
 			files = append(files, filename)
 		}
 	}
-	fmt.Println("ls", files)
 	return files
 }
 
+// ----------------------------------------
+
+// smart a configurable filter when searching for files
 type smart struct {
 	includeBinary bool
 	exclude       *regexp.Regexp
@@ -235,7 +269,6 @@ func (me *smart) Match(path string) bool {
 }
 
 var (
-	//	red   = "\033[31m"
 	green = "\033[32m"
 	reset = "\033[0m"
 )
