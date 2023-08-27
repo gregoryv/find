@@ -5,7 +5,7 @@ go 1.21rc2
 require (
 	github.com/gregoryv/asserter v0.4.2
 	github.com/gregoryv/binext v0.2.0
-	github.com/gregoryv/options v0.1.2
+	github.com/gregoryv/options v0.2.0
 	github.com/gregoryv/qual v0.4.2
 )
 

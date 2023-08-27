@@ -4,8 +4,8 @@ github.com/gregoryv/binext v0.2.0 h1:JPqCRI8LvounPKPBZi4KINwT4V7xvFwiDVvnOfveRcU
 github.com/gregoryv/binext v0.2.0/go.mod h1:ZPF3/RFv8VOGEcHUSUJY1cv1L6aDfEcDPpVlV2BSH9I=
 github.com/gregoryv/gocyclo v0.1.1 h1:wRhY+jEiXtNqtxOSI1XfXmbRaRknzvVtO5QOSg5KVHo=
 github.com/gregoryv/gocyclo v0.1.1/go.mod h1:e1PwkEyshvXjhPGP0RUXqlEXx09aBSSNj0wL8I/P/3I=
-github.com/gregoryv/options v0.1.2 h1:cJ9y1YZDhjykW7JbX05I9SCY5Voc5F7PSQT3n+4uh+Y=
-github.com/gregoryv/options v0.1.2/go.mod h1:cR7DuZMLSNWbsZiYwG8NS/AfKqZtl6Cd+IYZDCdcL0A=
+github.com/gregoryv/options v0.2.0 h1:fXraFXRd8iA4pY4ckgnrUetFeneD2b11nqBkqWrDAl0=
+github.com/gregoryv/options v0.2.0/go.mod h1:cR7DuZMLSNWbsZiYwG8NS/AfKqZtl6Cd+IYZDCdcL0A=
 github.com/gregoryv/qual v0.4.2 h1:Pb8T2CRoAIYBKzwxCwfSxHyRNW20Mo8+kMtXQ8MOX5Q=
 github.com/gregoryv/qual v0.4.2/go.mod h1:qi5L/TR4lnCuIFsOC2G8dtTOui6787/lFNquekcjxmQ=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
