@@ -14,7 +14,7 @@ import (
 
 	"github.com/gregoryv/binext"
 	"github.com/gregoryv/find"
-	"github.com/gregoryv/options"	
+	"github.com/gregoryv/options"
 )
 
 var usageTmpl = template.Must(template.New("").Parse(usage))
@@ -55,7 +55,7 @@ Examples
 var f = options.New(flag.NewFlagSet(os.Args[0], flag.ExitOnError))
 
 func main() {
-	var e Envs	
+	var e Envs
 	var colors bool
 	f.BoolVar(&colors, "color", false)
 	f.BoolVar(&colors, "c", false)
@@ -79,7 +79,7 @@ func main() {
 	e.StringVar(&exclude, excludeDef, "IFIND_EXCLUDE_REGEXP")
 
 	var verbose bool
-	f.BoolVar(&verbose, "v", false)	
+	f.BoolVar(&verbose, "v", false)
 	f.BoolVar(&verbose, "verbose", false)
 
 	f.Usage = func() {
