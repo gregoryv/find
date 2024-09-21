@@ -36,6 +36,7 @@ Options
     -e, --exclude, $IFIND_EXCLUDE_REGEXP : "^.git/|(pdf|svg)$"
         Regexp for excluding paths
 
+    -F, --hide-filenames
     -v, --verbose
     -h, --help
 
@@ -71,6 +72,10 @@ func main() {
 	var aliasPrefix string
 	f.StringVar(&aliasPrefix, "a", "")
 	f.StringVar(&aliasPrefix, "alias-prefix", "")
+
+	var hideFilename bool
+	f.BoolVar(&hideFilename, "F", false)
+	f.BoolVar(&hideFilename, "hide-filenames", hideFilename)
 
 	var exclude string
 	var excludeDef = "^.git/|(pdf|svg)$"
@@ -157,7 +162,13 @@ func main() {
 	if index == 0 {
 		var i int
 		for _, fm := range s.LastResult() {
-			fmt.Fprintln(w, fm.Filename)
+			if !hideFilename {
+				if colors {
+					fmt.Fprintf(w, "%s%s%s\n", cyan, fm.Filename, reset)
+				} else {
+					fmt.Fprintf(w, "%s\n", fm.Filename)
+				}
+			}
 			for _, m := range fm.Result {
 				text := m.Text
 				if colors {
@@ -167,7 +178,9 @@ func main() {
 				fmt.Fprintln(w, i+1, text)
 				i++
 			}
-			fmt.Fprintln(w)
+			if !hideFilename {			
+				fmt.Fprintln(w)
+			}
 		}
 		return
 	}
@@ -271,6 +284,7 @@ func (me *smart) Match(path string) bool {
 }
 
 var (
+	cyan = "\033[36m"
 	green = "\033[32m"
 	reset = "\033[0m"
 )
