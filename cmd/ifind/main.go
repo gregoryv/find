@@ -178,7 +178,7 @@ func main() {
 				fmt.Fprintln(w, i+1, text)
 				i++
 			}
-			if !hideFilename {			
+			if !hideFilename {
 				fmt.Fprintln(w)
 			}
 		}
@@ -284,7 +284,7 @@ func (me *smart) Match(path string) bool {
 }
 
 var (
-	cyan = "\033[36m"
+	cyan  = "\033[36m"
 	green = "\033[32m"
 	reset = "\033[0m"
 )
