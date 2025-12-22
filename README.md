@@ -1,6 +1,4 @@
-[![Build Status](https://app.travis-ci.com/gregoryv/find.svg?branch=master)](https://app.travis-ci.com/gregoryv/find)
-[![codecov](https://codecov.io/gh/gregoryv/find/branch/master/graph/badge.svg)](https://codecov.io/gh/gregoryv/find)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3dbee57c607ffec60702/maintainability)](https://codeclimate.com/github/gregoryv/find/maintainability)
+ARCHIVED! Moved to https://sogvin.com/find
 
 [find](https://godoc.org/github.com/gregoryv/find) - Go package for locating files
 
